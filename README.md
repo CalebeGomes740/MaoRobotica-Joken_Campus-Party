@@ -20,8 +20,8 @@ Este é um dos projetos mais interessantes, onde combinamos robótica e intelig�
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/seu-usuario/mao-robotica-jokenpo.git](https://github.com/seu-usuario/mao-robotica-jokenpo.git)
-    cd mao-robotica-jokenpo
+    git clone [https://github.com/CalebeGomes740/MaoRobotica-Joken_Campus-Party.git](https://github.com/CalebeGomes740/MaoRobotica-Joken_Campus-Party.git)
+    cd MaoRobotica-Joken_Campus-Party
     ```
 2.  **Instale as dependências Python:**
     ```bash
