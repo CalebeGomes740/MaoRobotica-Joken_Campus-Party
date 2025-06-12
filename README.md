@@ -45,15 +45,6 @@ Você pode encontrar o repositório completo e mais detalhes sobre este projeto 
 * **Ferramentas:** Git, Docker, [Ferramenta 1], [Ferramenta 2]
 * **Áreas de Interesse:** Inteligência Artificial, Robótica, Visão Computacional, Desenvolvimento de Hardware.
 
----
-
-## 💡 Outros Projetos e Contribuições
-
-* **[Nome de Outro Projeto 1]**: [Breve descrição e link para o repositório].
-* **[Nome de Outro Projeto 2]**: [Breve descrição e link para o repositório].
-* Contribuições para [Nome do Projeto Open Source, se houver].
-
----
 
 **[Calebe_Gomes]**
 
