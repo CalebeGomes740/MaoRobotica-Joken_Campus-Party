@@ -1,9 +1,9 @@
 import cv2
 import mediapipe as mp
-import servo_braco3d as mao
+# import servo_braco3d as mao
 
 # cap = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 cap.set(3,640)
 cap.set(4,480)
@@ -41,31 +41,31 @@ while True:
 
                 # print(distPolegar)
 
-                if distPolegar <80:
+                # if distPolegar <80:
 
-                    mao.abrir_fechar(10,0)
-                else:
-                    mao.abrir_fechar(10,1)
+                #     mao.abrir_fechar(10,0)
+                # else:
+                #     mao.abrir_fechar(10,1)
 
-                if distIndicador >=1:
-                    mao.abrir_fechar(9,1)
-                else:
-                    mao.abrir_fechar(9,0)
+                # if distIndicador >=1:
+                #     mao.abrir_fechar(9,1)
+                # else:
+                #     mao.abrir_fechar(9,0)
 
-                if distMedio >=1:
-                    mao.abrir_fechar(8,1)
-                else:
-                    mao.abrir_fechar(8,0)
+                # if distMedio >=1:
+                #     mao.abrir_fechar(8,1)
+                # else:
+                #     mao.abrir_fechar(8,0)
 
-                if distAnelar >=1:
-                    mao.abrir_fechar(7,1)
-                else:
-                    mao.abrir_fechar(7,0)
+                # if distAnelar >=1:
+                #     mao.abrir_fechar(7,1)
+                # else:
+                #     mao.abrir_fechar(7,0)
 
-                if distMinimo >=1:
-                    mao.abrir_fechar(6,1)
-                else:
-                    mao.abrir_fechar(6,0)
+                # if distMinimo >=1:
+                #     mao.abrir_fechar(6,1)
+                # else:
+                #     mao.abrir_fechar(6,0)
 
 
     cv2.imshow('Imagem',img)
