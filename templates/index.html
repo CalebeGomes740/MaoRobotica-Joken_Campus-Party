@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câmera e Jokenpo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Importa Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Câmera e Jokenpo</h1>
+    </header>
+    <main>
+        <div class="container">
+            <!-- Seção da Câmera -->
+            <section class="camera-section card">
+                <h2><i class="fas fa-video"></i> Câmera</h2>
+                <div class="video-container">
+                    <img id="camera-feed" src="/video_feed" alt="Camera Feed">
+                    <p id="camera-status" class="status-message">Conectando à câmera...</p>
+                </div>
+                <div class="controls">
+                    <button id="start-processing" class="button primary"><i class="fas fa-play"></i> Iniciar Processamento</button>
+                    <button id="stop-processing" class="button danger"><i class="fas fa-stop"></i> Parar Processamento</button>
+                </div>
+            </section>
+
+            <!-- Seção do Jokenpo -->
+            <section class="jokenpo-game-section card">
+                <h2><i class="fas fa-hand-rock"></i> Jokenpo</h2>
+                <div class="scoreboard">
+                    <div class="score">
+                        <span class="player-score" id="player-score">0</span>
+                        <p>Jogador</p>
+                    </div>
+                    <div class="separator">-</div>
+                    <div class="score">
+                        <span class="ai-score" id="ai-score">0</span>
+                        <p>IA</p>
+                    </div>
+                </div>
+                <div class="round-info">
+                    <p>Rodadas: <span id="rounds-played">0</span></p>
+                </div>
+                <div class="current-gestures">
+                    <div class="player-gesture">
+                        <p>Você: <span id="player-current-gesture">Nenhum</span></p>
+                        <div class="gesture-icon" id="player-choice-icon">
+                            <i class="fas fa-question"></i>
+                        </div>
+                    </div>
+                    <div class="ai-gesture">
+                        <p>IA: <span id="ai-current-choice">Nenhum</span></p>
+                        <div class="gesture-icon" id="ai-choice-icon">
+                            <i class="fas fa-question"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-message">
+                    <p id="round-result">Aguardando Jogada</p>
+                </div>
+                <div class="jokenpo-controls">
+                    <button id="play-round-button" class="button success"><i class="fas fa-fist-raised"></i> Jogar Rodada</button>
+                    <button id="reset-scoreboard" class="button info"><i class="fas fa-sync-alt"></i> Reiniciar Placar</button>
+                </div>
+                <div class="debug-info">
+                    <p>Gesto Detectado (Backend): <span id="detected-gesture-feedback">Nenhum</span></p>
+                    <pre id="jokenpo-json-display"></pre>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2025 Jokenpo IA. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
