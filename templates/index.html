@@ -3,76 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Câmera e Mão Robótica</title>
+    <title>Câmera e Jokenpo</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Importa Font Awesome para ícones -->
+    <!-- Import Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Integração de Câmera e Mão Robótica</h1>
+        <h1>Câmera e Jokenpo</h1>
     </header>
     <main>
         <div class="container">
-            <!-- Seção da Câmera -->
+            <!-- Camera Section -->
             <section class="camera-section card">
                 <h2><i class="fas fa-video"></i> Câmera</h2>
                 <div class="video-container">
-                    <!-- O feed da câmera agora vem do endpoint do Flask -->
                     <img id="camera-feed" src="/video_feed" alt="Camera Feed">
                     <p id="camera-status" class="status-message">Conectando à câmera...</p>
                 </div>
                 <div class="controls">
-                    <!-- Estes botões agora controlam o processamento MediaPipe no backend -->
                     <button id="start-processing" class="button primary"><i class="fas fa-play"></i> Iniciar Processamento</button>
                     <button id="stop-processing" class="button danger"><i class="fas fa-stop"></i> Parar Processamento</button>
                 </div>
             </section>
 
-            <!-- Seção da Mão Robótica -->
-            <section class="robot-arm-section card">
-                <h2><i class="fas fa-robot"></i> Mão Robótica (Simulação)</h2>
-                <div id="robot-arm-display">
-                    <!-- Representação SVG da mão robótica -->
-                    <svg width="250" height="250" viewBox="0 0 250 250" id="robot-arm-svg">
-                        <!-- Base do braço -->
-                        <rect x="100" y="200" width="50" height="40" rx="5" ry="5" fill="#666" class="arm-part"></rect>
-                        
-                        <!-- Segmento do braço 1 (ombro) -->
-                        <g id="arm-segment-shoulder" transform-origin="125 200">
-                            <rect x="115" y="100" width="20" height="100" rx="5" ry="5" fill="#999" class="arm-part"></rect>
-                            <!-- Segmento do braço 2 (cotovelo) -->
-                            <g id="arm-segment-elbow" transform-origin="125 100">
-                                <rect x="118" y="40" width="14" height="60" rx="3" ry="3" fill="#aaa" class="arm-part"></rect>
-                                <!-- Mão -->
-                                <g id="robot-hand" transform-origin="125 40">
-                                    <rect x="105" y="10" width="40" height="30" rx="5" ry="5" fill="#bbb" class="arm-part"></rect>
-                                    <!-- Dedos -->
-                                    <!-- Polegar -->
-                                    <rect x="100" y="0" width="8" height="20" rx="2" ry="2" fill="#ccc" class="finger" id="finger-thumb" transform-origin="104 20"></rect>
-                                    <!-- Indicador -->
-                                    <rect x="115" y="0" width="8" height="20" rx="2" ry="2" fill="#ccc" class="finger" id="finger-index" transform-origin="119 20"></rect>
-                                    <!-- Médio -->
-                                    <rect x="127" y="0" width="8" height="20" rx="2" ry="2" fill="#ccc" class="finger" id="finger-middle" transform-origin="131 20"></rect>
-                                    <!-- Anelar -->
-                                    <rect x="140" y="0" width="8" height="20" rx="2" ry="2" fill="#ccc" class="finger" id="finger-ring" transform-origin="144 20"></rect>
-                                    <!-- Mínimo -->
-                                    <rect x="152" y="0" width="8" height="20" rx="2" ry="2" fill="#ccc" class="finger" id="finger-pinky" transform-origin="156 20"></rect>
-                                </g>
-                            </g>
-                        </g>
-                    </svg>
+            <!-- Jokenpo Section -->
+            <section class="jokenpo-game-section card">
+                <h2><i class="fas fa-hand-rock"></i> Jokenpo</h2>
+                <div class="scoreboard">
+                    <div class="score">
+                        <span class="player-score" id="player-score">0</span>
+                        <p>Jogador</p>
+                    </div>
+                    <div class="separator">-</div>
+                    <div class="score">
+                        <span class="ai-score" id="ai-score">0</span>
+                        <p>IA</p>
+                    </div>
                 </div>
-                <div class="robot-arm-controls">
+                <div class="round-info">
+                    <p>Rodadas: <span id="rounds-played">0</span></p>
+                </div>
+                
+                <!-- Contagem regressiva -->
+                <div class="countdown-display">
+                    <p id="countdown-message"></p>
+                </div>
+
+                <div class="current-gestures">
+                    <div class="player-info">
+                        <p>Você: <span id="player-current-gesture">Nenhum</span></p>
+                        <div class="gesture-icon" id="player-choice-icon">
+                            <i class="fas fa-question"></i>
+                        </div>
+                    </div>
+                    <div class="ai-info">
+                        <p>IA: <span id="ai-current-choice">Nenhum</span></p>
+                        <div class="gesture-icon" id="ai-choice-icon">
+                            <i class="fas fa-question"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-message">
+                    <p id="round-result">Aguardando...</p>
+                </div>
+                <div class="jokenpo-controls">
+                    <button id="play-round-button" class="button success"><i class="fas fa-fist-raised"></i> Jogar Rodada</button>
+                    <button id="reset-scoreboard" class="button info"><i class="fas fa-sync-alt"></i> Reiniciar Placar</button>
+                </div>
+                <div class="debug-info">
                     <p>Mão Detectada: <span id="hand-detected-status">Não</span></p>
-                    <p>Estado do Processamento: <span id="robot-arm-status-text">Inativo</span></p>
-                    <pre id="robot-arm-json-display"></pre>
+                    <p>Gesto Detectado (Backend): <span id="detected-gesture-feedback">Nenhum</span></p>
+                    <pre id="jokenpo-json-display"></pre>
                 </div>
             </section>
         </div>
     </main>
     <footer>
-        <p>&copy; 2025 Projeto Mão Robótica. Todos os direitos reservados.</p>
+        <p>&copy; 2025 Jokenpo IA. Todos os direitos reservados.</p>
     </footer>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
