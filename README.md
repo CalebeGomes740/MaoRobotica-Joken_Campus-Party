@@ -12,7 +12,7 @@ Este é um dos meus projetos mais interessantes, onde combinei robótica e intel
 ### Tecnologias Utilizadas no Projeto
 
 * **Python:** Linguagem principal para desenvolvimento da IA e lógica de controle da mão robótica.
-* **Microcontrolador (ex: Arduino/Raspberry Pi):** Para interfacear e controlar os servos da mão robótica.
+* **Microcontrolador (Arduino):** Para interfacear e controlar os servos da mão robótica.
 * **Hardware de Robótica:** Servos, componentes estruturais para a mão robótica.
 * **OpenCV (Planejado):** Para futuras capacidades de visão computacional.
 
@@ -34,35 +34,27 @@ Este é um dos meus projetos mais interessantes, onde combinei robótica e intel
     ```
     *(Instruções detalhadas estarão no README do projeto.)*
 
-Você pode encontrar o repositório completo e mais detalhes sobre este projeto em: [https://github.com/seu-usuario/mao-robotica-jokenpo](https://github.com/seu-usuario/mao-robotica-jokenpo)
+Você pode encontrar o repositório completo e mais detalhes sobre este projeto em: [https://github.com/CalebeGomes740/MaoRobotica-Joken_Campus-Party/](https://github.com/CalebeGomes740/MaoRobotica-Joken_Campus-Party/)
 
 ---
 
-## 🛠️ Minhas Habilidades Técnicas
-
-* **Linguagens de Programação:** Python, [Outra Linguagem 1], [Outra Linguagem 2]
-* **Frameworks/Bibliotecas:** [Framework 1], [Biblioteca 1], [Biblioteca 2]
-* **Ferramentas:** Git, Docker, [Ferramenta 1], [Ferramenta 2]
-* **Áreas de Interesse:** Inteligência Artificial, Robótica, Visão Computacional, Desenvolvimento de Hardware.
-
-
-**[Calebe_Gomes]**
+**[Calebe Gomes]**
 
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/CalebeGomes740)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](URL_DO_SEU_LINKEDIN)
 
 ---
 
-**[Seu Nome]**
+**[Jesiel dos Santos]**
 
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SEU_USUARIO_GITHUB)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](URL_DO_SEU_LINKEDIN)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jesieldossantos)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jesiel-dos-santos-54478422b)
 
 ---
-**[Seu Nome]**
+**[Paulo Alves]**
 
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SEU_USUARIO_GITHUB)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](URL_DO_SEU_LINKEDIN)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/pauloalvezz)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/paulo-alves-35717a309)
 
 ---
 
