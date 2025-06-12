@@ -1,125 +1,126 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Elementos HTML da Câmera e Controles de Processamento ---
+    // --- Camera HTML Elements and Processing Controls ---
     const cameraFeed = document.getElementById('camera-feed');
     const cameraStatus = document.getElementById('camera-status');
     const startProcessingButton = document.getElementById('start-processing');
     const stopProcessingButton = document.getElementById('stop-processing');
 
-    // --- Elementos SVG para a mão robótica ---
-    const robotArmSvg = document.getElementById('robot-arm-svg');
-    const armSegmentShoulder = document.getElementById('arm-segment-shoulder');
-    const armSegmentElbow = document.getElementById('arm-segment-elbow');
-    const robotHand = document.getElementById('robot-hand'); // Este grupo pode não ser usado diretamente para rotação de dedos, mas é bom ter a referência
-    const fingerThumb = document.getElementById('finger-thumb');
-    const fingerIndex = document.getElementById('finger-index');
-    const fingerMiddle = document.getElementById('finger-middle');
-    const fingerRing = document.getElementById('finger-ring');
-    const fingerPinky = document.getElementById('finger-pinky');
-
-    // --- Elementos de status no frontend ---
+    // --- Jokenpo HTML Elements ---
+    const playerScoreSpan = document.getElementById('player-score');
+    const aiScoreSpan = document.getElementById('ai-score');
+    const roundsPlayedSpan = document.getElementById('rounds-played');
+    const playerCurrentGestureSpan = document.getElementById('player-current-gesture');
+    const aiCurrentChoiceSpan = document.getElementById('ai-current-choice');
+    const playerChoiceIcon = document.getElementById('player-choice-icon');
+    const aiChoiceIcon = document.getElementById('ai-choice-icon');
+    const roundResultParagraph = document.getElementById('round-result');
+    const playRoundButton = document.getElementById('play-round-button');
+    const resetScoreboardButton = document.getElementById('reset-scoreboard');
     const handDetectedStatus = document.getElementById('hand-detected-status');
-    const robotArmStatusText = document.getElementById('robot-arm-status-text');
-    const robotArmJsonDisplay = document.getElementById('robot-arm-json-display');
+    const detectedGestureFeedback = document.getElementById('detected-gesture-feedback');
+    const jokenpoJsonDisplay = document.getElementById('jokenpo-json-display');
+    const countdownMessageElement = document.getElementById('countdown-message');
 
-    // --- Define os pontos de origem para rotação dos dedos no SVG ---
-    // Estes pontos foram ajustados visualmente no SVG para que as rotações pareçam naturais.
-    const fingerOrigins = {
-        "finger-thumb": "104 20", // X Y do ponto de pivô para o polegar (relativo ao seu grupo 'robot-hand' ou ao próprio SVG)
-        "finger-index": "119 20", // X Y do ponto de pivô para o indicador
-        "finger-middle": "131 20",
-        "finger-ring": "144 20",
-        "finger-pinky": "156 20"
+    // --- Mapping Jokenpo Moves to Font Awesome Icons ---
+    const jokenpoIcons = {
+        "Pedra": "fas fa-hand-rock",
+        "Papel": "fas fa-hand-paper",
+        "Tesoura": "fas fa-hand-scissors",
+        "Nenhum": "fas fa-question",
+        "Indefinido": "fas fa-question"
     };
 
-    // Mapeia o nome do dedo do estado do backend para o elemento SVG correspondente
-    const fingerElements = {
-        "finger_thumb": fingerThumb,
-        "finger_index": fingerIndex,
-        "finger_middle": fingerMiddle,
-        "finger_ring": fingerRing,
-        "finger_pinky": fingerPinky
-    };
-
-    // --- Função para atualizar a visualização da mão robótica com base no estado do backend ---
-    async function updateRobotArmDisplay() {
+    // --- Function to update Jokenpo game state and UI ---
+    async function updateJokenpoGameDisplay() {
         try {
-            // Faz uma requisição GET ao endpoint do Flask para obter o estado da mão
-            const response = await fetch('/robot_arm_status');
+            const response = await fetch('/jokenpo_game_status');
             if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
+                throw new Error(`HTTP Error: ${response.status}`);
             }
             const data = await response.json();
             
-            // Exibe o JSON cru para depuração
-            robotArmJsonDisplay.textContent = JSON.stringify(data, null, 2);
+            jokenpoJsonDisplay.textContent = JSON.stringify(data, null, 2);
 
-            // Atualiza o status da câmera
+            // Update camera status
             if (data.camera_is_active) {
                 cameraStatus.textContent = 'Câmera do Backend Ativa';
-                cameraStatus.style.backgroundColor = 'rgba(46, 204, 113, 0.8)'; // Verde
+                cameraStatus.style.backgroundColor = 'rgba(46, 204, 113, 0.8)';
             } else {
                 cameraStatus.textContent = 'Câmera do Backend Inativa/Erro';
-                cameraStatus.style.backgroundColor = 'rgba(231, 76, 60, 0.8)'; // Vermelho
+                cameraStatus.style.backgroundColor = 'rgba(231, 76, 60, 0.8)';
             }
 
-            // Atualiza o status de detecção de mão
+            // Update scoreboard elements
+            playerScoreSpan.textContent = data.player_score;
+            aiScoreSpan.textContent = data.ai_score;
+            roundsPlayedSpan.textContent = data.rounds_played;
+
+            // Update player's and AI's choices and icons
+            playerCurrentGestureSpan.textContent = data.player_choice;
+            aiCurrentChoiceSpan.textContent = data.ai_choice;
+
+            playerChoiceIcon.innerHTML = `<i class="${jokenpoIcons[data.player_choice]}"></i>`;
+            aiChoiceIcon.innerHTML = `<i class="${jokenpoIcons[data.ai_choice]}"></i>`;
+
+            // Update round result message and its color
+            roundResultParagraph.textContent = data.result_message;
+            roundResultParagraph.className = 'result-message';
+            if (data.result_message.includes('Você venceu!')) {
+                roundResultParagraph.classList.add('won');
+            } else if (data.result_message.includes('Robô venceu!')) {
+                roundResultParagraph.classList.add('lost');
+            } else if (data.result_message.includes('Empate!')) {
+                roundResultParagraph.classList.add('draw');
+            }
+
+            // Update hand detection status
             if (data.hand_detected) {
                 handDetectedStatus.textContent = 'Sim';
-                handDetectedStatus.style.color = '#2ecc71'; // Verde se mão detectada
+                handDetectedStatus.style.color = '#2ecc71';
             } else {
                 handDetectedStatus.textContent = 'Não';
-                handDetectedStatus.style.color = '#e74c3c'; // Vermelho se não detectada
+                handDetectedStatus.style.color = '#e74c3c';
             }
 
-            // Atualiza a rotação dos dedos com base nos dados do backend
-            // A lógica de 0 (fechado) e 45 (aberto) é definida no mock de 'mao' no Python.
-            for (const fingerKey in fingerElements) {
-                const element = fingerElements[fingerKey];
-                const angle = data[fingerKey]; // Pega o ângulo do estado do backend
-                const origin = fingerOrigins[element.id]; // Pega o ponto de pivô do dedo
+            // Update detected gesture feedback from backend
+            detectedGestureFeedback.textContent = data.current_gesture_detected;
 
-                if (element && origin) {
-                    // Adaptação: Inverte a rotação para o polegar para simular fechamento
-                    // Os outros dedos giram em um sentido para "abrir"
-                    if (fingerKey === "finger_thumb") {
-                        element.style.transform = `rotate(${-angle}deg)`;
-                    } else {
-                        element.style.transform = `rotate(${angle}deg)`;
-                    }
-                    element.setAttribute('transform-origin', origin);
-                }
-            }
-
-            // Atualiza o texto do status de processamento MediaPipe
+            // Update MediaPipe processing status and button states
             if (data.mediapipe_processing_active) {
-                robotArmStatusText.textContent = "Processando...";
-                robotArmStatusText.style.color = '#2980b9'; // Azul
+                startProcessingButton.style.display = 'none';
+                stopProcessingButton.style.display = 'inline-flex';
+                // Enable play button only if game phase is 'waiting_start'
+                playRoundButton.disabled = (data.game_phase !== "waiting_start");
             } else {
-                robotArmStatusText.textContent = "Inativo";
-                robotArmStatusText.style.color = '#6c757d'; // Cinza
+                startProcessingButton.style.display = 'inline-flex';
+                stopProcessingButton.style.display = 'none';
+                playRoundButton.disabled = true;
             }
+
+            // Update countdown message
+            countdownMessageElement.textContent = data.countdown_message;
 
         } catch (error) {
-            console.error('Erro ao obter status da mão robótica:', error);
-            robotArmStatusText.textContent = "Erro de Conexão com Backend.";
-            robotArmStatusText.style.color = '#e67e22'; // Laranja para erro
+            console.error('Error getting Jokenpo status:', error);
+            roundResultParagraph.textContent = "Erro de Conexão com Backend.";
+            roundResultParagraph.classList.add('lost');
             cameraStatus.textContent = 'Erro de Conexão com Backend';
-            cameraStatus.style.backgroundColor = 'rgba(231, 76, 60, 0.8)'; // Vermelho
+            cameraStatus.style.backgroundColor = 'rgba(231, 76, 60, 0.8)';
+            playRoundButton.disabled = true;
         }
     }
 
-    // Define um intervalo para buscar e atualizar o estado da mão robótica a cada 100ms
-    setInterval(updateRobotArmDisplay, 100);
+    setInterval(updateJokenpoGameDisplay, 100);
 
-    // --- Controles de Processamento ---
+    // --- Processing and Game Controls ---
     startProcessingButton.addEventListener('click', async () => {
         try {
             const response = await fetch('/control_processing/start');
             const data = await response.json();
-            console.log('Controle de processamento:', data.message);
-            updateRobotArmDisplay(); // Força atualização imediata
+            console.log('Processing control:', data.message);
+            updateJokenpoGameDisplay();
         } catch (error) {
-            console.error('Erro ao iniciar processamento:', error);
+            console.error('Error starting processing:', error);
         }
     });
 
@@ -127,13 +128,39 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/control_processing/stop');
             const data = await response.json();
-            console.log('Controle de processamento:', data.message);
-            updateRobotArmDisplay(); // Força atualização imediata
+            console.log('Processing control:', data.message);
+            updateJokenpoGameDisplay();
         } catch (error) {
-            console.error('Erro ao parar processamento:', error);
+            console.error('Error stopping processing:', error);
         }
     });
 
-    // Chama a função de atualização da mão robótica na inicialização da página
-    updateRobotArmDisplay();
+    playRoundButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/play_jokenpo');
+            const data = await response.json();
+            console.log('Round Start Message:', data.message);
+
+            if (data.status === "error") {
+                alert(data.message);
+            }
+            updateJokenpoGameDisplay();
+        } catch (error) {
+            console.error('Error initiating round:', error);
+            alert('Não foi possível iniciar a rodada. Verifique a conexão com o servidor.');
+        }
+    });
+
+    resetScoreboardButton.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/reset_jokenpo');
+            const data = await response.json();
+            console.log('Scoreboard Reset:', data.message);
+            updateJokenpoGameDisplay();
+        } catch (error) {
+            console.error('Error resetting scoreboard:', error);
+        }
+    });
+
+    updateJokenpoGameDisplay();
 });
