@@ -1,6 +1,6 @@
 ## 🌟 Projeto em Destaque: Mão Robótica para Pedra-Papel-Tesoura com IA em Python
 
-Este é um dos meus projetos mais interessantes, onde combinei robótica e inteligência artificial para criar um sistema interativo de jogo de Jokenpô.
+Este é um dos projetos mais interessantes, onde combinamos robótica e inteligência artificial para criar um sistema interativo de jogo de Jokenpô.
 
 ### Funcionalidades do Projeto
 
