@@ -167,11 +167,7 @@ h2 {
     background-color: #5a6268;
 }
 
-
 /* Styles for the Jokenpo section */
-.jokenpo-game-section {
-    /* No specific SVG styles needed here, as the scoreboard is pure HTML */
-}
 
 .scoreboard {
     display: flex;

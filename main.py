@@ -46,9 +46,9 @@ def resultado_jogo(jogador, robo):
     elif (jogador == "Pedra" and robo == "Tesoura") or \
          (jogador == "Tesoura" and robo == "Papel") or \
          (jogador == "Papel" and robo == "Pedra"):
-        return "Você venceu!"
+        return "Voce venceu!"
     else:
-        return "Robô venceu!"
+        return "Robo venceu!"
 
 timer_start = None
 tempo_espera = 3
@@ -56,78 +56,82 @@ contagem = ""
 jogada_robo = None
 resultado = "Aguardando..."
 fase_finalizada = False
-
+placar_humano = 0
+placar_robo = 0
 while True:
-    success, img = cap.read()
-    if not success or img is None:
-        print("Erro na captura da câmera")
+    # Captura o frame da webcam
+    ret, img = cap.read()
+    if not ret:
         break
 
+    img = cv2.flip(img, 1)
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = hands.process(img_rgb)
-    h, w, _ = img.shape
-    pontos = []
 
-    gesto_jogador = "Nenhum"
+    gesto_jogador = "Indefinido"
 
     if results.multi_hand_landmarks:
-        for handLms in results.multi_hand_landmarks:
-            mp_draw.draw_landmarks(img, handLms, mp_hands.HAND_CONNECTIONS)
-            for id, lm in enumerate(handLms.landmark):
+        for hand_landmarks in results.multi_hand_landmarks:
+            pontos = []
+            for id, lm in enumerate(hand_landmarks.landmark):
+                h, w, c = img.shape
                 cx, cy = int(lm.x * w), int(lm.y * h)
                 pontos.append((cx, cy))
-
-        if pontos:
-            gesto_jogador = detectar_gesto(pontos)
-
-            # Inicia timer se gesto for válido e ainda não começou
-            if gesto_jogador != "Indefinido" and timer_start is None and not fase_finalizada:
+            mp_draw.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            if len(pontos) == 21:
+                gesto_jogador = detectar_gesto(pontos)
+            if timer_start is None:
                 timer_start = time.time()
-                jogada_robo = None
-                resultado = "Contando..."
+                fase_finalizada = False
+                contagem = ""
+    else:
+        gesto_jogador = "Indefinido"
 
-            # Se o timer estiver rodando
-            if timer_start is not None and not fase_finalizada:
-                tempo_passado = time.time() - timer_start
-                segundos_restantes = int(tempo_espera - tempo_passado) + 1  # +1 para parecer mais natural
-
-                if segundos_restantes > 0:
-                    contagem = f"Jogue em... {segundos_restantes}"
-                else:
-                    # Timer zerou, robô joga
-                    if jogada_robo is None:
-                        jogada_robo = escolher_jogada_robo()
-                        resultado = resultado_jogo(gesto_jogador, jogada_robo)
-                        fase_finalizada = True
-                    contagem = "Jogada!"
-
+    if timer_start is not None and not fase_finalizada:
+        segundos_restantes = tempo_espera - int(time.time() - timer_start)
+        if segundos_restantes > 0:
+            contagem = str(segundos_restantes)
         else:
-            # Sem pontos: resetar tudo
+            # Timer zerou, robô joga
+            if jogada_robo is None:
+                jogada_robo = escolher_jogada_robo()
+                resultado_text = resultado_jogo(gesto_jogador, jogada_robo)
+                resultado = resultado_text
+                if resultado_text == "Voce venceu!":
+                    placar_humano += 1
+                elif resultado_text == "Robo venceu!":
+                    placar_robo += 1
+                fase_finalizada = True
+                contagem = "Jogada!"
+
+        # Sem pontos ou após jogada: resetar tudo
+        if fase_finalizada and contagem == "Jogada!":
+            time.sleep(2)  # Aguarde 2 segundos antes de resetar
             timer_start = None
             jogada_robo = None
             resultado = "Aguardando..."
             contagem = ""
             fase_finalizada = False
-    else:
         # Sem mão: resetar tudo
-        timer_start = None
-        jogada_robo = None
-        resultado = "Aguardando..."
-        contagem = ""
-        fase_finalizada = False
+        if not results.multi_hand_landmarks:
+            timer_start = None
+            jogada_robo = None
+            resultado = "Aguardando..."
+            contagem = ""
 
     # Exibe textos na tela
     cv2.putText(img, f'Sua jogada: {gesto_jogador}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
     cv2.putText(img, f'Jogada robo: {jogada_robo if jogada_robo else "..." }', (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
     cv2.putText(img, f'Resultado: {resultado}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+    cv2.putText(img, f'Placar Total - Voce: {placar_humano} | Robo: {placar_robo}', (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,0), 2)
 
     # Exibe contagem regressiva grande no centro
     if contagem:
-        cv2.putText(img, contagem, (int(w/2)-100, int(h/2)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 4)
+        cv2.putText(img, contagem, (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 2, (150, 0, 0), 4)
 
     cv2.imshow("Jokenpô: Pessoa vs Mão Robótica", img)
-
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        print(f"Placar Final - Voce: {placar_humano} | Robo: {placar_robo}")
         break
 
 cap.release()
