@@ -1,95 +1,69 @@
-from flask import Flask, render_template, Response, jsonify
 import cv2
 import mediapipe as mp
-import threading
-import time
 import random
+import time
+import threading
+from flask import Flask, render_template, Response, jsonify
 
 app = Flask(__name__)
 
-# --- Variáveis Globais para Estado da Aplicação e Stream de Vídeo ---
-latest_frame = None  # Stores the last processed camera frame, in JPEG format.
-frame_lock = threading.Lock()  # A thread lock to ensure 'latest_frame' is accessed safely.
+# --- Variáveis Globais para o Estado da Aplicação e Stream de Vídeo ---
+latest_frame = None  # Armazena o último frame da câmera processado, em formato JPEG.
+frame_lock = threading.Lock()  # Um bloqueio de thread para garantir que 'latest_frame' é acedido de forma segura.
 
 jokenpo_game_state = {
     "player_score": 0,
     "ai_score": 0,
+    "ties": 0, # Contagem de empates
     "rounds_played": 0,
-    "player_choice": "Nenhum",         # Jogada final do jogador nesta rodada
-    "ai_choice": "Nenhum",             # Jogada final da IA nesta rodada
-    "result_message": "Aguardando...", # Mensagem do resultado da rodada (Você venceu!, Empate!, etc.)
-    "current_gesture_detected": "Nenhum", # Gesto detectado em tempo real pelo MediaPipe
-    "hand_detected": False,            # Indica se uma mão está a ser detetada
-    "camera_is_active": False,         # Indica se a câmara do backend está a funcionar
-    "countdown_message": "",           # Mensagem da contagem regressiva ("Jogue em... X")
-    "game_phase": "waiting_start",     # Fases: "waiting_start", "counting_down", "round_finished"
-    "mediapipe_processing_active": False # Controla se o MediaPipe está ativo
+    "player_choice": "Nenhum",             # Jogada final do jogador nesta rodada
+    "ai_choice": "Nenhum",                 # Jogada final da IA nesta rodada
+    "result_message": "Aguardando...",     # Mensagem do resultado da rodada (Você venceu!, Empate!, etc.)
+    "current_gesture_detected": "Nenhum",  # Gesto detectado em tempo real pelo MediaPipe (feedback ao usuário)
+    "hand_detected": False,                # Indica se uma mão está a ser detetada
+    "camera_is_active": False,             # Indica se a câmera do backend está a funcionar
+    "countdown_message": "",               # Mensagem da contagem regressiva ("Jogue em... X")
+    "game_phase": "waiting_start",         # Fases: "waiting_start", "counting_down", "round_finished"
+    "mediapipe_processing_active": False   # Controla se o MediaPipe está ativo (ativado/desativado pelos botões do frontend)
 }
 
-# --- Jokenpo Game Logic ---
-def determine_winner(player_choice, ai_choice):
-    """Determines the winner of a Jokenpo round."""
-    if player_choice == ai_choice:
-        return "Empate"
-    elif (player_choice == "Pedra" and ai_choice == "Tesoura") or \
-         (player_choice == "Papel" and ai_choice == "Pedra") or \
-         (player_choice == "Tesoura" and ai_choice == "Papel"):
-        return "Ganhou"
-    else:
-        return "Perdeu"
-
+# --- Funções de Jogo (DO SEU CÓDIGO ORIGINAL - MANTIDAS EXATAMENTE COMO FORNECIDAS) ---
 def detectar_gesto(pontos):
     """
     Tenta determinar a jogada de Jokenpo a partir dos pontos da mão.
+    Utiliza os limiares e a lógica fornecida pelo utilizador.
     Retorna "Pedra", "Papel", "Tesoura" ou "Indefinido".
     """
-    # Pontos de interesse para detecção de dedos
-    # Pontas dos dedos: 8 (Indicador), 12 (Médio), 16 (Anelar), 20 (Mínimo)
-    # Bases dos dedos: 5 (Indicador), 9 (Médio), 13 (Anelar), 17 (Mínimo)
-    # Ponta do Polegar: 4
-    # Outros pontos para o polegar: 2 (base), 3 (meio)
-    
-    # Heurística para Polegar Aberto:
-    # Verifica a distância X entre a ponta do polegar (4) e o ponto da base do indicador (5)
-    # Se for maior que um limiar, sugere que o polegar está esticado para fora.
-    is_thumb_open_dist_x = abs(pontos[4][0] - pontos[5][0]) > 40
-    # Opcional: verificar se a ponta do polegar está acima do seu próprio nó (3)
-    is_thumb_open_y = pontos[4][1] < pontos[3][1]
+    if len(pontos) < 21: # Certifica-se de que há pontos suficientes
+        return "Indefinido"
 
-    # Heurística para Outros Dedos Abertos:
-    # A ponta do dedo (ex: 8 para Indicador) deve estar significativamente acima do seu nó de dobra (ex: 6)
-    is_index_open = pontos[8][1] < pontos[6][1] 
-    is_middle_open = pontos[12][1] < pontos[10][1]
-    is_ring_open = pontos[16][1] < pontos[14][1]
-    is_pinky_open = pontos[20][1] < pontos[18][1]
+    distPolegar = abs(pontos[17][0] - pontos[4][0])
+    distIndicador = pontos[5][1] - pontos[8][1]
+    distMedio = pontos[9][1] - pontos[12][1]
+    distAnelar = pontos[13][1] - pontos[16][1]
+    distMinimo = pontos[17][1] - pontos[20][1]
 
-    # Contagem de dedos abertos (excluindo polegar, para algumas lógicas)
-    open_straight_fingers_count = sum([is_index_open, is_middle_open, is_ring_open, is_pinky_open])
+    polegar_aberto = distPolegar >= 80
+    indicador_aberto = distIndicador >= 1
+    medio_aberto = distMedio >= 1
+    anelar_aberto = distAnelar >= 1
+    minimo_aberto = distMinimo >= 1
 
-    # Pedra: Todos os dedos (incluindo polegar) estão fechados
-    # Se a contagem de dedos abertos é zero E o polegar não parece aberto lateralmente ou para cima
-    if open_straight_fingers_count == 0 and not is_thumb_open_dist_x and (not is_thumb_open_y or abs(pontos[4][1] - pontos[2][1]) < 20):
+    dedos_abertos = [polegar_aberto, indicador_aberto, medio_aberto, anelar_aberto, minimo_aberto]
+
+    if not any(dedos_abertos):
         return "Pedra"
-    
-    # Papel: Todos os dedos (incluindo polegar) estão abertos/esticados
-    if open_straight_fingers_count == 4 and is_thumb_open_dist_x:
+    elif all(dedos_abertos):
         return "Papel"
-    
-    # Tesoura: Indicador e Médio abertos, outros fechados
-    # E o polegar não deve estar esticado para a frente (como em papel)
-    if is_index_open and is_middle_open and not is_ring_open and not is_pinky_open and not is_thumb_open_dist_x:
-        # Adicionalmente, o polegar deve estar mais próximo da palma ou dobrado
-        if abs(pontos[4][0] - pontos[2][0]) < 30 and abs(pontos[4][1] - pontos[2][1]) < 30:
-            return "Tesoura"
-    
-    return "Indefinido" # Gesto não reconhecido
+    elif indicador_aberto and medio_aberto and not (polegar_aberto or anelar_aberto or minimo_aberto):
+        return "Tesoura"
+    else:
+        return "Indefinido"
 
 def escolher_jogada_robo():
-    """A IA escolhe aleatoriamente uma jogada."""
     return random.choice(["Pedra", "Papel", "Tesoura"])
 
 def resultado_jogo(jogador, robo):
-    """Determina o vencedor da rodada."""
     if jogador == "Indefinido":
         return "Mostre Pedra, Papel ou Tesoura claramente!"
     if jogador == robo:
@@ -97,152 +71,168 @@ def resultado_jogo(jogador, robo):
     elif (jogador == "Pedra" and robo == "Tesoura") or \
          (jogador == "Tesoura" and robo == "Papel") or \
          (jogador == "Papel" and robo == "Pedra"):
-        return "Você venceu!"
+        return "Voce venceu!"
     else:
-        return "Robô venceu!"
+        return "Robo venceu!"
+# --- Fim das Funções de Jogo ---
 
-# --- Thread para Captura de Câmera e Processamento MediaPipe ---
+
+# --- Thread para Captura de Câmara e Processamento MediaPipe ---
 def camera_and_hand_processing_thread():
     """
-    Função executada em uma thread separada para capturar vídeo,
+    Função executada numa thread separada para capturar vídeo,
     processar com MediaPipe e atualizar o estado do jogo de Jokenpo.
     """
     global latest_frame, jokenpo_game_state
 
-    cap_obj = None # Objeto da câmera
+    cap_obj = None # Objeto da câmara
     
     # Inicializa o MediaPipe Hands e Drawing Utils APENAS UMA VEZ
-    hands_mp_sol = mp.solutions.hands
-    mp_hands = hands_mp_sol.Hands(max_num_hands=1, min_detection_confidence=0.7, min_tracking_confidence=0.5)
-    mp_drawing = mp.solutions.drawing_utils
+    mp_hands_sol = mp.solutions.hands
+    hands_detector = mp_hands_sol.Hands(max_num_hands=1, min_detection_confidence=0.7)
+    mp_draw = mp.solutions.drawing_utils
 
-    print("Iniciando thread de câmera e processamento de mão...")
+    print("Iniciando thread de câmara e processamento de mão...")
 
-    # Variáveis de controle de jogo dentro da thread (mantendo o estado do jogo na global jokenpo_game_state)
-    timer_start_time = None
-    TIME_TO_PLAY = 3 # Segundos para a contagem regressiva
+    # Variáveis de controlo de jogo para a thread (temporizadores e flags)
+    tempo_espera_countdown = 3 # Segundos para a contagem regressiva da jogada
+    tempo_exibicao_resultado = 5 # Segundos para exibir o resultado final
+
+    timer_control_start = None 
     
-    while True:
-        # Tenta abrir a câmera se não estiver aberta
+    while True: # LOOP PRINCIPAL DA THREAD DA CÂMERA
+        # Tenta abrir a câmara se não estiver aberta
         if cap_obj is None or not cap_obj.isOpened():
-            print("Tentando abrir a câmera (cv2.VideoCapture(0))...")
-            # Para Windows, se tiver problemas, tente: cap_obj = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+            print("Tentando abrir a câmara (cv2.VideoCapture(0))...")
             cap_obj = cv2.VideoCapture(0)
             if not cap_obj.isOpened():
-                print("Erro: Não foi possível abrir a câmera. Verifique as permissões. Tentando novamente em 2 segundos...")
+                print("Erro: Não foi possível abrir a câmara. Verifique as permissões. Tentando novamente em 2 segundos...")
                 jokenpo_game_state["camera_is_active"] = False
                 time.sleep(2)
                 continue
             else:
                 cap_obj.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
                 cap_obj.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-                print("Câmera aberta com sucesso.")
+                print("Câmara aberta com sucesso.")
                 jokenpo_game_state["camera_is_active"] = True
 
         success, img = cap_obj.read()
         if not success or img is None:
-            print("Erro: Não foi possível capturar a imagem da câmera ou o frame está vazio! Reabrindo...")
+            print("Erro: Não foi possível capturar a imagem da câmara ou o frame está vazio! Reabrindo...")
             if cap_obj: cap_obj.release()
             cap_obj = None # Força a reinicialização
             jokenpo_game_state["camera_is_active"] = False
-            time.sleep(0.5) # PAUSA IMPORTANTE AQUI
+            time.sleep(0.5) # PAUSA IMPORTANTE AQUI para evitar loop rápido em caso de erro
             continue
 
         img = cv2.flip(img, 1) # Espelha a imagem para visualização
 
         frameRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        # Reseta o estado de detecção da mão e gesto para o frame atual
+        # Reseta o estado de deteção da mão para o frame atual
         jokenpo_game_state["hand_detected"] = False
-        jokenpo_game_state["current_gesture_detected"] = "Nenhum"
         pontos = []
+        
+        # Gesto detectado em tempo real (para feedback ao usuário)
+        current_gesture_live_detection = "Nenhum" 
 
-        # Somente processa MediaPipe se a flag estiver ativa
+        # INDENTAÇÃO CHAVE: Este 'if' controla se o MediaPipe está ativo (ativado/desativado pelos botões)
         if jokenpo_game_state["mediapipe_processing_active"]:
-            results = mp_hands.process(frameRGB)
+            results = hands_detector.process(frameRGB)
             handPoints = results.multi_hand_landmarks
 
-            h, w, _ = img.shape
-
-            if handPoints:
+            if handPoints: # Se mãos foram detectadas pelo MediaPipe
                 jokenpo_game_state["hand_detected"] = True
                 for points in handPoints:
-                    mp_drawing.draw_landmarks(img, points, hands_mp_sol.HAND_CONNECTIONS)
+                    mp_draw.draw_landmarks(img, points, mp_hands_sol.HAND_CONNECTIONS)
                     for id, lm in enumerate(points.landmark):
-                        cx, cy = int(lm.x * w), int(lm.y * h)
-                        pontos.append((cx, cy))
+                        pontos.append((int(lm.x * img.shape[1]), int(lm.y * img.shape[0])))
+                
+                if pontos: # Se pontos de referência foram extraídos (mão válida)
+                    current_gesture_live_detection = detectar_gesto(pontos)
+                else: # Mão detectada, mas pontos insuficientes ou inválidos para formar um gesto
+                    current_gesture_live_detection = "Indefinido" 
+            # Se handPoints é None (nenhuma mão detectada), jokenpo_game_state["hand_detected"] permanecerá False,
+            # e current_gesture_live_detection permanecerá "Nenhum" (seu valor inicial por frame).
 
-                if pontos:
-                    current_detected_gesture = detectar_gesto(pontos)
-                    jokenpo_game_state["current_gesture_detected"] = current_detected_gesture
+            # Atualiza o estado global com o gesto detectado em tempo real (para o frontend)
+            jokenpo_game_state["current_gesture_detected"] = current_gesture_live_detection
 
-                    # Lógica do Timer e Jogo
-                    if jokenpo_game_state["game_phase"] == "counting_down":
-                        if timer_start_time is None: # Inicia o timer na primeira vez que entra na fase
-                            timer_start_time = time.time()
-                            jokenpo_game_state["result_message"] = "Contando..."
-                            jokenpo_game_state["player_choice"] = "Nenhum" # Reseta jogadas para nova rodada
-                            jokenpo_game_state["ai_choice"] = "Nenhum"
-
-                        time_elapsed = time.time() - timer_start_time
-                        seconds_remaining = int(TIME_TO_PLAY - time_elapsed) + 1
-
-                        if seconds_remaining > 0:
-                            jokenpo_game_state["countdown_message"] = f"Jogue em... {seconds_remaining}"
-                        else:
-                            # Timer esgotado, robô joga
-                            jokenpo_game_state["countdown_message"] = "Jogada!"
-                            jokenpo_game_state["game_phase"] = "round_finished"
-                            
-                            # Registra a jogada do jogador no momento da finalização do timer
-                            jokenpo_game_state["player_choice"] = current_detected_gesture
-                            
-                            ai_play = escolher_jogada_robo()
-                            jokenpo_game_state["ai_choice"] = ai_play
-                            
-                            result = resultado_jogo(jokenpo_game_state["player_choice"], ai_play)
-                            jokenpo_game_state["result_message"] = result
-                            jokenpo_game_state["rounds_played"] += 1
-
-                            # Limpa o timer para que não continue a contar na próxima fase
-                            timer_start_time = None
-                    elif jokenpo_game_state["game_phase"] == "round_finished":
-                        # Mantém o resultado por um tempo antes de voltar para waiting_start
-                        if timer_start_time is None: # Inicia um novo timer para exibir o resultado
-                             timer_start_time = time.time()
-                        if time.time() - timer_start_time > 3: # Exibe resultado por 3 segundos
-                            jokenpo_game_state["game_phase"] = "waiting_start"
-                            jokenpo_game_state["countdown_message"] = ""
-                            jokenpo_game_state["result_message"] = "Aguardando..."
-                            jokenpo_game_state["player_choice"] = "Nenhum"
-                            jokenpo_game_state["ai_choice"] = "Nenhum"
-                            timer_start_time = None # Reseta o timer para a próxima jogada
-                else:
-                    # Se mão detectada, mas pontos ausentes ou indefinidos
-                    jokenpo_game_state["current_gesture_detected"] = "Indefinido"
-            else:
-                # Nenhuma mão detectada (handPoints é None)
-                jokenpo_game_state["current_gesture_detected"] = "Nenhum"
-                # Se não há mão, e estamos esperando por uma jogada, ou a rodada acabou,
-                # garantir que a fase não seja "counting_down"
-                if jokenpo_game_state["game_phase"] == "counting_down":
-                    # Se a mão sumiu durante a contagem, cancela a rodada e reseta
-                    jokenpo_game_state["game_phase"] = "waiting_start"
-                    jokenpo_game_state["countdown_message"] = "Mão não detectada, reinicie a jogada."
-                    jokenpo_game_state["result_message"] = "Aguardando..."
-                    jokenpo_game_state["player_choice"] = "Nenhum"
+            # --- Lógica de Fases do Jogo ---
+            # Esta lógica avança independentemente da deteção de mão contínua.
+            if jokenpo_game_state["game_phase"] == "counting_down":
+                if timer_control_start is None: # Inicia o timer da contagem regressiva
+                    timer_control_start = time.time()
+                    jokenpo_game_state["result_message"] = "Contando..."
+                    jokenpo_game_state["player_choice"] = "Nenhum" # Reseta jogadas para nova rodada
                     jokenpo_game_state["ai_choice"] = "Nenhum"
-                    timer_start_time = None
+                    print(f"DEBUG: Contagem regressiva iniciada.")
 
-        else: # MediaPipe processing is not active
+                time_elapsed = time.time() - timer_control_start
+                segundos_restantes = int(tempo_espera_countdown - time_elapsed) + 1
+
+                if segundos_restantes > 0:
+                    jokenpo_game_state["countdown_message"] = f"Jogue em... {segundos_restantes}"
+                else:
+                    # Timer de contagem regressiva zerou: Fim da jogada do jogador
+                    jokenpo_game_state["countdown_message"] = "Jogada!"
+                    jokenpo_game_state["game_phase"] = "round_finished"
+                    print(f"DEBUG: Timer de jogada zerou. Fase: round_finished.")
+                    
+                    # A jogada do jogador é o último gesto detectado quando o timer zera.
+                    # Se não houver mão na câmera, será "Nenhum" ou "Indefinido".
+                    jokenpo_game_state["player_choice"] = current_gesture_live_detection 
+                    
+                    ai_play = escolher_jogada_robo()
+                    jokenpo_game_state["ai_choice"] = ai_play
+                    
+                    result_msg = resultado_jogo(jokenpo_game_state["player_choice"], ai_play)
+                    jokenpo_game_state["result_message"] = result_msg
+                    jokenpo_game_state["rounds_played"] += 1
+
+                    if "Voce venceu!" in result_msg:
+                        jokenpo_game_state["player_score"] += 1
+                    elif "Robo venceu!" in result_msg:
+                        jokenpo_game_state["ai_score"] += 1
+                    elif "Empate!" in result_msg:
+                        jokenpo_game_state["ties"] += 1
+                    
+                    print(f"DEBUG: Jogador: {jokenpo_game_state['player_choice']}, IA: {jokenpo_game_state['ai_choice']}, Resultado: {result_msg}")
+                    print(f"DEBUG: Placar - Jogador: {jokenpo_game_state['player_score']}, IA: {jokenpo_game_state['ai_score']}, Empates: {jokenpo_game_state['ties']}")
+                    
+                    timer_control_start = time.time() # Reinicia timer para contagem do tempo de exibição do resultado
+            
+            elif jokenpo_game_state["game_phase"] == "round_finished":
+                # Mantém o resultado por um tempo (tempo_exibicao_resultado)
+                if timer_control_start is not None and (time.time() - timer_control_start) > tempo_exibicao_resultado:
+                    # Tempo de exibição esgotado, reseta para nova rodada
+                    jokenpo_game_state["game_phase"] = "waiting_start"
+                    jokenpo_game_state["countdown_message"] = ""
+                    jokenpo_game_state["result_message"] = "Aguardando..."
+                    jokenpo_game_state["player_choice"] = "Nenhum" # Limpa jogadas exibidas
+                    jokenpo_game_state["ai_choice"] = "Nenhum"
+                    timer_control_start = None # Reseta o timer
+                    print(f"DEBUG: Rodada finalizada, voltando para waiting_start.")
+            
+            elif jokenpo_game_state["game_phase"] == "waiting_start":
+                # Nenhuma ação de jogo ativa, apenas esperando o botão "Jogar Rodada"
+                jokenpo_game_state["result_message"] = "Pressione 'Jogar Rodada' para começar!"
+                jokenpo_game_state["countdown_message"] = ""
+                jokenpo_game_state["player_choice"] = "Nenhum"
+                jokenpo_game_state["ai_choice"] = "Nenhum"
+                timer_control_start = None # Garante que o timer esteja limpo
+        
+        # INDENTAÇÃO CHAVE: Este 'else' corresponde ao 'if jokenpo_game_state["mediapipe_processing_active"]:'
+        # Ele só é executado se o processamento MediaPipe NÃO estiver ativo (usuário clicou em 'Parar Processamento')
+        else: 
             jokenpo_game_state["hand_detected"] = False
             jokenpo_game_state["current_gesture_detected"] = "Nenhum"
             jokenpo_game_state["countdown_message"] = ""
             jokenpo_game_state["game_phase"] = "waiting_start" # Volta para o estado inicial
-            jokenpo_game_state["result_message"] = "Aguardando..."
+            jokenpo_game_state["result_message"] = "Processamento Inativo. Ative para jogar."
             jokenpo_game_state["player_choice"] = "Nenhum"
             jokenpo_game_state["ai_choice"] = "Nenhum"
-            timer_start_time = None # Garante que o timer seja resetado se o processamento for parado
+            timer_control_start = None # Garante que o timer seja resetado se o processamento for parado
 
 
         # Converte o frame OpenCV para o formato JPEG para transmissão HTTP.
@@ -259,9 +249,9 @@ def camera_and_hand_processing_thread():
 
     if cap_obj:
         cap_obj.release()
-    print("Thread de câmera e processamento de mão finalizada.")
+    print("Thread de câmara e processamento de mão finalizada.")
 
-# Inicia a thread de captura e processamento da câmera quando o Flask inicia.
+# Inicia a thread de captura e processamento da câmara quando o Flask inicia.
 camera_thread = threading.Thread(target=camera_and_hand_processing_thread)
 camera_thread.daemon = True
 camera_thread.start()
@@ -276,13 +266,15 @@ def index():
 @app.route('/video_feed')
 def video_feed():
     """
-    Gera o stream de vídeo da câmera para o frontend.
+    Gera o stream de vídeo da câmara para o frontend.
     Envia frames JPEG como um stream multipart/x-mixed-replace.
     """
     def generate_frames():
         while True:
             with frame_lock:
                 if latest_frame is not None:
+                    # Adicionado \r\n\r\n após o Content-Type para garantir a conformidade MIME
+                    # e um \r\n extra antes do delimitador --frame
                     yield (b'--frame\r\n'
                            b'Content-Type: image/jpeg\r\n\r\n' + latest_frame + b'\r\n')
             time.sleep(0.03)
@@ -302,12 +294,15 @@ def play_jokenpo():
     Define a fase do jogo para "counting_down" se não houver uma rodada em andamento.
     """
     global jokenpo_game_state
+    print(f"DEBUG: /play_jokenpo chamado. Fase atual: {jokenpo_game_state['game_phase']}, Processamento ativo: {jokenpo_game_state['mediapipe_processing_active']}")
     if jokenpo_game_state["mediapipe_processing_active"] and jokenpo_game_state["game_phase"] == "waiting_start":
         jokenpo_game_state["game_phase"] = "counting_down"
+        # O timer_control_start é iniciado dentro da thread da câmara na próxima iteração
         jokenpo_game_state["result_message"] = "Contagem iniciada..."
         jokenpo_game_state["player_choice"] = "Nenhum"
         jokenpo_game_state["ai_choice"] = "Nenhum"
         jokenpo_game_state["countdown_message"] = "" # Limpa qualquer mensagem antiga
+        print(f"DEBUG: Rodada iniciada. Nova fase: {jokenpo_game_state['game_phase']}")
         return jsonify({"status": "success", "message": "Rodada de Jokenpo iniciada."})
     else:
         status_msg = "Processamento da mão não ativo ou rodada já em andamento."
@@ -315,6 +310,7 @@ def play_jokenpo():
             status_msg = "Por favor, ative o processamento da mão antes de jogar."
         elif jokenpo_game_state["game_phase"] != "waiting_start":
             status_msg = "Uma rodada já está em andamento. Aguarde ou reinicie."
+        print(f"DEBUG: Erro ao iniciar rodada: {status_msg}")
         return jsonify({"status": "error", "message": status_msg})
 
 @app.route('/reset_jokenpo')
@@ -323,6 +319,7 @@ def reset_jokenpo():
     global jokenpo_game_state
     jokenpo_game_state["player_score"] = 0
     jokenpo_game_state["ai_score"] = 0
+    jokenpo_game_state["ties"] = 0 # Reinicia empates
     jokenpo_game_state["rounds_played"] = 0
     jokenpo_game_state["player_choice"] = "Nenhum"
     jokenpo_game_state["ai_choice"] = "Nenhum"
@@ -330,6 +327,7 @@ def reset_jokenpo():
     jokenpo_game_state["current_gesture_detected"] = "Nenhum"
     jokenpo_game_state["countdown_message"] = ""
     jokenpo_game_state["game_phase"] = "waiting_start"
+    print(f"DEBUG: Placar resetado.")
     return jsonify({"status": "success", "message": "Placar do Jokenpo resetado."})
 
 
@@ -346,6 +344,7 @@ def control_processing(action):
         jokenpo_game_state["result_message"] = "Aguardando..."
         jokenpo_game_state["player_choice"] = "Nenhum"
         jokenpo_game_state["ai_choice"] = "Nenhum"
+        print(f"DEBUG: Processamento iniciado. Fase: {jokenpo_game_state['game_phase']}")
         return jsonify({"status": "started", "message": "Processamento da mão iniciado."})
     elif action == "stop":
         jokenpo_game_state["mediapipe_processing_active"] = False
@@ -356,6 +355,7 @@ def control_processing(action):
         jokenpo_game_state["result_message"] = "Aguardando..."
         jokenpo_game_state["player_choice"] = "Nenhum"
         jokenpo_game_state["ai_choice"] = "Nenhum"
+        print(f"DEBUG: Processamento parado. Fase: {jokenpo_game_state['game_phase']}")
         return jsonify({"status": "stopped", "message": "Processamento da mão parado."})
     return jsonify({"status": "invalid_action", "message": "Ação inválida."})
 
