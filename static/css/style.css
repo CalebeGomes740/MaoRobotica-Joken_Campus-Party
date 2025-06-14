@@ -1,9 +1,13 @@
+/* Import the Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Smooth background gradient */
-    color: #334e68; /* Main text color */
+    /* Tons de azul claro para o fundo */
+    background: linear-gradient(135deg, #e0f2f7, #c1e4f0); /* Gradiente de azul claro */
+    color: #334e68; /* Cor de texto principal (mantida para contraste) */
     line-height: 1.6;
     display: flex;
     flex-direction: column;
@@ -11,8 +15,9 @@ body {
 }
 
 header {
-    background-color: #2c3e50; /* Dark blue */
-    color: #ecf0f1; /* Light gray */
+    /* Tons de azul mais escuro para o cabeçalho */
+    background-color: #4db6ac; /* Verde-azulado escuro */
+    color: #ffffff; /* Branco */
     padding: 1.5rem 0;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -43,7 +48,7 @@ main {
 }
 
 .card {
-    background-color: #ffffff;
+    background-color: #ffffff; /* Mantido branco para destaque */
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
     padding: 25px;
@@ -62,7 +67,8 @@ main {
 }
 
 h2 {
-    color: #3498db; /* Vibrant blue */
+    /* Tons de azul para os títulos de seção */
+    color: #26c6da; /* Ciano mais brilhante */
     margin-top: 0;
     font-weight: 600;
     font-size: 1.8rem;
@@ -75,7 +81,7 @@ h2 {
     width: 100%;
     max-width: 640px;
     height: auto;
-    border: 2px solid #ddd;
+    border: 2px solid #a7d9eb; /* Borda em azul claro */
     background-color: #000;
     border-radius: 8px;
     overflow: hidden; /* Ensures video fits border-radius */
@@ -133,41 +139,45 @@ h2 {
 }
 
 .button.primary {
-    background-color: #3498db;
+    /* Azul mais vibrante para botões primários */
+    background-color: #26c6da; 
     color: white;
 }
 
 .button.primary:hover {
-    background-color: #2980b9;
+    background-color: #00bcd4; /* Um pouco mais escuro no hover */
 }
 
 .button.danger {
-    background-color: #e74c3c;
+    background-color: #ef5350; /* Vermelho mais suave */
     color: white;
 }
 
 .button.danger:hover {
-    background-color: #c0392b;
+    background-color: #e53935;
 }
 
 .button.success {
-    background-color: #2ecc71;
+    background-color: #66bb6a; /* Verde mais suave */
     color: white;
 }
 
 .button.success:hover {
-    background-color: #27ae60;
+    background-color: #43a047;
 }
 
 .button.info {
-    background-color: #6c757d; /* Gray for info/reset buttons */
+    background-color: #90a4ae; /* Azul-acinzentado para botões de informação/reset */
     color: white;
 }
 .button.info:hover {
-    background-color: #5a6268;
+    background-color: #78909c;
 }
 
 /* Styles for the Jokenpo section */
+.jokenpo-game-section {
+    /* No specific SVG styles needed here, as the scoreboard is pure HTML */
+}
 
 .scoreboard {
     display: flex;
@@ -178,7 +188,8 @@ h2 {
     font-size: 2rem;
     font-weight: 700;
     color: #2c3e50;
-    background-color: #ecf0f1;
+    /* Fundo do placar em tom de azul claro */
+    background-color: #e3f2fd; /* Azul muito claro */
     padding: 15px 30px;
     border-radius: 10px;
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
@@ -189,13 +200,13 @@ h2 {
 }
 
 .score span {
+    color: #26c6da; /* Ciano para a pontuação */
     font-size: 3rem;
-    color: #3498db;
 }
 
 .separator {
     font-size: 3rem;
-    color: #95a5a6;
+    color: #b0bec5; /* Cinza azulado */
 }
 
 .round-info {
@@ -205,18 +216,71 @@ h2 {
 }
 
 .round-info span {
+    color: #26c6da; /* Ciano para info da rodada */
     font-weight: 700;
-    color: #2980b9;
 }
 
+/* Nova área de feedback do jogo (placar mini e resultado principal) */
+.game-feedback-area {
+    width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 10px; /* Padding for the entire feedback area */
+    background-color: #e0f7fa; /* Azul mais claro ainda */
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* Subtle shadow */
+}
+
+.scoreboard-mini {
+    background-color: #b3e5fc; /* Azul claro para o mini placar */
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #334e68;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.scoreboard-mini p {
+    margin: 0;
+}
+
+.scoreboard-mini span {
+    color: #03a9f4; /* Azul mais intenso para pontuação mini */
+    font-weight: 700;
+}
+
+.result-message-area {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#round-result-main { /* Mensagem de resultado principal */
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50; /* Default color for result */
+    margin: 0 0 10px 0; /* Spacing below the message */
+}
+
+/* Colors for the result (main) */
+#round-result-main.won { color: #4caf50; } /* Verde vibrante */
+#round-result-main.lost { color: #f44336; } /* Vermelho vibrante */
+#round-result-main.draw { color: #ffeb3b; } /* Amarelo vibrante */
+
+
 .countdown-display {
-    margin: 15px 0;
+    margin-top: 5px; /* Adjust to not conflict with result message */
 }
 
 #countdown-message {
     font-size: 2.2rem;
     font-weight: 700;
-    color: #e67e22; /* Laranja para a contagem */
+    color: #ff9800; /* Laranja (mantido vibrante para contraste) */
     transition: color 0.3s ease;
 }
 
@@ -232,8 +296,8 @@ h2 {
 .player-info, .ai-info {
     flex: 1;
     min-width: 120px; /* Minimum width for each gesture box */
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background-color: #f0f8ff; /* Fundo mais claro para info de jogada */
+    border: 1px solid #e1f5fe; /* Borda azul claro */
     border-radius: 8px;
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -246,23 +310,10 @@ h2 {
 
 .gesture-icon {
     font-size: 3rem;
-    color: #7f8c8d; /* Default color for gesture icons */
+    color: #7f8c8d; /* Default color for gesture icons (mantido) */
     margin-top: 10px;
     transition: transform 0.2s ease-out; /* Animation for icons */
 }
-
-.result-message {
-    margin-bottom: 20px;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2c3e50; /* Default color for result */
-}
-
-/* Colors for the result */
-.result-message.won p { color: #2ecc71; } /* Green */
-.result-message.lost p { color: #e74c3c; } /* Red */
-.result-message.draw p { color: #f39c12; } /* Orange */
-
 
 .jokenpo-controls {
     display: flex;
@@ -277,8 +328,8 @@ h2 {
     width: 100%;
     font-size: 0.9rem;
     text-align: left;
-    background-color: #ecf0f1;
-    border: 1px solid #c0d9ea;
+    background-color: #e0f2f7; /* Tom de azul claro para debug */
+    border: 1px solid #b3e0ed; /* Borda mais escura */
     border-radius: 8px;
     padding: 10px 15px;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
@@ -291,11 +342,11 @@ h2 {
 
 .debug-info span {
     font-weight: 400;
-    color: #34495e;
+    color: #3f51b5; /* Azul mais escuro para valores debug */
 }
 
 #jokenpo-json-display {
-    background-color: #ecf0f1;
+    background-color: #e0f2f7; /* Mesmo fundo que debug-info */
     border: none;
     border-radius: 0;
     padding: 0;
@@ -311,10 +362,9 @@ h2 {
 }
 
 footer {
-    text-align: center;
-    padding: 1.5rem 0;
-    background-color: #2c3e50;
-    color: #ecf0f1;
+    /* Tons de azul mais escuro para o rodapé */
+    background-color: #4db6ac; 
+    color: #ffffff;
     margin-top: auto; /* Pushes the footer to the bottom of the page */
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -374,8 +424,8 @@ footer {
     .separator {
         font-size: 2.5rem;
     }
-    .result-message {
-        font-size: 1.2rem;
+    #round-result-main {
+        font-size: 1.4rem; /* Smaller on small screens */
     }
     #countdown-message {
         font-size: 1.8rem;
