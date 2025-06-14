@@ -41,7 +41,7 @@ Você pode encontrar o repositório completo e mais detalhes sobre este projeto 
 **[Calebe Gomes]**
 
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/CalebeGomes740)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](URL_DO_SEU_LINKEDIN)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)]((https://www.linkedin.com/in/calebe-gomes-de-magalh%C3%A3es-b8b326369/))
 
 ---
 
