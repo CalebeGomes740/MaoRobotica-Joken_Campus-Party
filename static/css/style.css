@@ -5,9 +5,8 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    /* Tons de azul claro para o fundo */
-    background: linear-gradient(135deg, #e0f2f7, #c1e4f0); /* Gradiente de azul claro */
-    color: #334e68; /* Cor de texto principal (mantida para contraste) */
+    background: linear-gradient(135deg, #e0f2f7, #c1e4f0);
+    color: #334e68;
     line-height: 1.6;
     display: flex;
     flex-direction: column;
@@ -15,9 +14,8 @@ body {
 }
 
 header {
-    /* Tons de azul mais escuro para o cabeçalho */
-    background-color: #4db6ac; /* Verde-azulado escuro */
-    color: #ffffff; /* Branco */
+    background-color: #4db6ac;
+    color: #ffffff;
     padding: 1.5rem 0;
     text-align: center;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -33,42 +31,74 @@ main {
     flex: 1;
     padding: 20px;
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align to the top */
+    flex-direction: column; /* Organiza as linhas verticalmente */
+    align-items: center;
     flex-grow: 1;
+    width: 100%;
 }
 
-.container {
+.main-layout-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px; /* Spacing between cards */
+    flex-direction: column;
+    gap: 30px; /* Espaço entre as seções (linhas) principais */
+    width: 100%;
+    max-width: 1200px; /* Largura máxima para o conteúdo principal */
+}
+
+/* Estilos para a linha superior (Placar e Controles) */
+.top-info-controls-row {
+    display: flex;
+    justify-content: center; /* Centraliza o card na linha */
+    width: 100%;
+}
+
+/* Estilos para a linha do meio (Câmeras) */
+.camera-robot-row {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    gap: 30px;
     justify-content: center;
     width: 100%;
-    max-width: 1200px; /* Max content width */
 }
 
+/* Estilos para a linha inferior (Mensagens e Debug) */
+.bottom-messages-debug-row {
+    display: flex;
+    flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+    gap: 30px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Estilos gerais para os cards */
 .card {
-    background-color: #ffffff; /* Mantido branco para destaque */
+    background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     padding: 25px;
-    flex: 1;
-    min-width: 320px; /* Minimum width for mobile */
-    max-width: 550px; /* Max width for each card */
+    flex: 1; /* Permite que os cards cresçam e encolham dentro de suas linhas */
+    min-width: 300px; /* Largura mínima para mobile */
+    max-width: 585px; /* Ajuste para ter 2 cards por linha com gap de 30px em 1200px */
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    transition: transform 0.3s ease-in-out; /* Hover animation */
+    transition: transform 0.3s ease-in-out;
+    box-sizing: border-box; /* Inclui padding e borda na largura total */
 }
 
+/* Card para Placar e Controles (linha superior) */
+.game-scoreboard-controls {
+    max-width: 800px; /* Um pouco mais largo para acomodar tudo em uma coluna grande */
+}
+
+
 .card:hover {
-    transform: translateY(-5px); /* Lift effect */
+    transform: translateY(-5px);
 }
 
 h2 {
-    /* Tons de azul para os títulos de seção */
-    color: #26c6da; /* Ciano mais brilhante */
+    color: #26c6da;
     margin-top: 0;
     font-weight: 600;
     font-size: 1.8rem;
@@ -79,24 +109,24 @@ h2 {
 
 .video-container {
     width: 100%;
-    max-width: 640px;
+    max-width: 640px; /* Mantido para a imagem da câmera */
     height: auto;
-    border: 2px solid #a7d9eb; /* Borda em azul claro */
+    border: 2px solid #a7d9eb;
     background-color: #000;
     border-radius: 8px;
-    overflow: hidden; /* Ensures video fits border-radius */
+    overflow: hidden;
     margin-bottom: 20px;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
     position: relative;
-    aspect-ratio: 16 / 9; /* Maintains 16:9 aspect ratio */
+    aspect-ratio: 16 / 9;
 }
 
 #camera-feed {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures video fills container */
-    display: block; /* Removes extra space below video */
-    transform: scaleX(-1); /* Flips video to simulate a mirror */
+    object-fit: contain; /* ALTERADO: Usa 'contain' para garantir que a imagem inteira seja visível */
+    display: block;
+    transform: scaleX(-1);
 }
 
 .status-message {
@@ -117,8 +147,87 @@ h2 {
     flex-wrap: wrap;
     justify-content: center;
     margin-top: 10px;
+    width: 100%; /* Ocupa a largura total do seu container pai */
 }
 
+/* Estilos para o ícone de gesto ao vivo do jogador */
+.player-info-live {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.player-info-live p {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+    color: #334e68;
+}
+
+.player-info-live .gesture-icon {
+    font-size: 4rem; /* Um pouco maior que os placares de gesto */
+    color: #26c6da; /* Ciano */
+}
+
+
+/* Estilos para a seção da Mão Robótica */
+.robot-section .robot-hand-display {
+    width: 100%;
+    max-width: 640px;
+    height: 250px; /* Mantém uma altura consistente com a câmera */
+    background-color: #e3f2fd;
+    border: 2px solid #a7d9eb;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px; /* Adiciona espaço abaixo da mão robótica */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.robot-section .robot-status {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #4db6ac;
+    margin: 0;
+}
+
+.robot-section .gesture-icon {
+    font-size: 6rem;
+    color: #26c6da;
+}
+
+/* Estilos para feedback de jogo da IA (contagem e resultado) */
+.ai-game-feedback {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-game-feedback .countdown-ai {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ff9800; /* Laranja */
+    margin: 0;
+}
+
+.ai-game-feedback .result-ai {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50; /* Cor padrão */
+    margin: 0;
+}
+.ai-game-feedback .result-ai.won { color: #4caf50; }
+.ai-game-feedback .result-ai.lost { color: #f44336; }
+.ai-game-feedback .result-ai.draw { color: #ffeb3b; }
+
+
+/* Botões - estilos gerais */
 .button {
     padding: 12px 25px;
     border: none;
@@ -138,45 +247,19 @@ h2 {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.button.primary {
-    /* Azul mais vibrante para botões primários */
-    background-color: #26c6da; 
-    color: white;
-}
+.button.primary { background-color: #26c6da; color: white; }
+.button.primary:hover { background-color: #00bcd4; }
+.button.danger { background-color: #ef5350; color: white; }
+.button.danger:hover { background-color: #e53935; }
+.button.success { background-color: #66bb6a; color: white; }
+.button.success:hover { background-color: #43a047; }
+.button.info { background-color: #90a4ae; color: white; }
+.button.info:hover { background-color: #78909c; }
 
-.button.primary:hover {
-    background-color: #00bcd4; /* Um pouco mais escuro no hover */
-}
 
-.button.danger {
-    background-color: #ef5350; /* Vermelho mais suave */
-    color: white;
-}
-
-.button.danger:hover {
-    background-color: #e53935;
-}
-
-.button.success {
-    background-color: #66bb6a; /* Verde mais suave */
-    color: white;
-}
-
-.button.success:hover {
-    background-color: #43a047;
-}
-
-.button.info {
-    background-color: #90a4ae; /* Azul-acinzentado para botões de informação/reset */
-    color: white;
-}
-.button.info:hover {
-    background-color: #78909c;
-}
-
-/* Styles for the Jokenpo section */
-.jokenpo-game-section {
-    /* No specific SVG styles needed here, as the scoreboard is pure HTML */
+/* Estilos para a seção do Placar e Controles (dentro do top-info-controls-row) */
+.game-scoreboard-controls {
+    /* Herda de .card */
 }
 
 .scoreboard {
@@ -188,69 +271,39 @@ h2 {
     font-size: 2rem;
     font-weight: 700;
     color: #2c3e50;
-    /* Fundo do placar em tom de azul claro */
-    background-color: #e3f2fd; /* Azul muito claro */
+    background-color: #e3f2fd;
     padding: 15px 30px;
     border-radius: 10px;
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.score {
-    text-align: center;
-}
-
-.score span {
-    color: #26c6da; /* Ciano para a pontuação */
-    font-size: 3rem;
-}
-
-.separator {
-    font-size: 3rem;
-    color: #b0bec5; /* Cinza azulado */
-}
+.score { text-align: center; }
+.score span { color: #26c6da; font-size: 3rem; }
+.separator { font-size: 3rem; color: #b0bec5; }
 
 .round-info {
     margin-bottom: 20px;
     font-size: 1.1rem;
     font-weight: 500;
-}
-
-.round-info span {
-    color: #26c6da; /* Ciano para info da rodada */
-    font-weight: 700;
-}
-
-/* Nova área de feedback do jogo (placar mini e resultado principal) */
-.game-feedback-area {
     width: 100%;
-    margin-top: 20px;
+    text-align: center;
+}
+.round-info span { color: #26c6da; font-weight: 700; }
+
+.jokenpo-controls {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    padding: 10px; /* Padding for the entire feedback area */
-    background-color: #e0f7fa; /* Azul mais claro ainda */
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08); /* Subtle shadow */
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
 }
 
-.scoreboard-mini {
-    background-color: #b3e5fc; /* Azul claro para o mini placar */
-    padding: 8px 15px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #334e68;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.scoreboard-mini p {
-    margin: 0;
-}
-
-.scoreboard-mini span {
-    color: #03a9f4; /* Azul mais intenso para pontuação mini */
-    font-weight: 700;
+/* Estilos para a seção de Mensagens Principais (dentro de bottom-messages-debug-row) */
+.main-messages-section {
+    /* Herda de .card */
 }
 
 .result-message-area {
@@ -258,176 +311,101 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px; /* Espaço entre os elementos de mensagem */
 }
 
-#round-result-main { /* Mensagem de resultado principal */
+#round-result-main {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #2c3e50; /* Default color for result */
-    margin: 0 0 10px 0; /* Spacing below the message */
+    color: #2c3e50;
+    margin: 0;
 }
+#round-result-main.won { color: #4caf50; }
+#round-result-main.lost { color: #f44336; }
+#round-result_main.draw { color: #ffeb3b; }
 
-/* Colors for the result (main) */
-#round-result-main.won { color: #4caf50; } /* Verde vibrante */
-#round-result-main.lost { color: #f44336; } /* Vermelho vibrante */
-#round-result-main.draw { color: #ffeb3b; } /* Amarelo vibrante */
-
-
-.countdown-display {
-    margin-top: 5px; /* Adjust to not conflict with result message */
-}
-
+.countdown-display { margin: 0; }
 #countdown-message {
     font-size: 2.2rem;
     font-weight: 700;
-    color: #ff9800; /* Laranja (mantido vibrante para contraste) */
+    color: #ff9800;
     transition: color 0.3s ease;
+    margin: 0;
 }
 
-.current-gestures {
-    display: flex;
-    justify-content: space-around;
+/* Estilos para a seção de Debug (dentro de bottom-messages-debug-row) */
+.debug-info-section {
+    /* Herda de .card */
+    text-align: left;
+}
+
+.debug-content {
     width: 100%;
-    margin-bottom: 20px;
-    flex-wrap: wrap; /* Allows wrapping on small screens */
-    gap: 15px;
 }
 
-.player-info, .ai-info {
-    flex: 1;
-    min-width: 120px; /* Minimum width for each gesture box */
-    background-color: #f0f8ff; /* Fundo mais claro para info de jogada */
-    border: 1px solid #e1f5fe; /* Borda azul claro */
+.debug-info-section h3 {
+    margin-top: 0;
+    color: #26c6da;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+.debug-info-section p { margin: 0 0 5px 0; font-weight: 600; }
+.debug-info-section span { font-weight: 400; color: #3f51b5; }
+#jokenpo-json-display {
+    background-color: #e0f2f7;
+    border: 1px solid #b3e0ed;
     border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.current-gestures p {
-    margin-bottom: 5px;
-    font-weight: 600;
-}
-
-.gesture-icon {
-    font-size: 3rem;
-    color: #7f8c8d; /* Default color for gesture icons (mantido) */
-    margin-top: 10px;
-    transition: transform 0.2s ease-out; /* Animation for icons */
-}
-
-.jokenpo-controls {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.debug-info {
-    margin-top: 25px;
-    width: 100%;
-    font-size: 0.9rem;
-    text-align: left;
-    background-color: #e0f2f7; /* Tom de azul claro para debug */
-    border: 1px solid #b3e0ed; /* Borda mais escura */
-    border-radius: 8px;
-    padding: 10px 15px;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
-}
-
-.debug-info p {
-    margin: 0 0 5px 0;
-    font-weight: 600;
-}
-
-.debug-info span {
-    font-weight: 400;
-    color: #3f51b5; /* Azul mais escuro para valores debug */
-}
-
-#jokenpo-json-display {
-    background-color: #e0f2f7; /* Mesmo fundo que debug-info */
-    border: none;
-    border-radius: 0;
-    padding: 0;
     margin-top: 5px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.8rem;
     white-space: pre-wrap;
     word-break: break-all;
-    max-height: 120px; /* Limited height for JSON */
+    max-height: 150px;
     overflow-y: auto;
     width: 100%;
     text-align: left;
+    box-sizing: border-box;
 }
 
 footer {
-    /* Tons de azul mais escuro para o rodapé */
-    background-color: #4db6ac; 
+    background-color: #4db6ac;
     color: #ffffff;
-    margin-top: auto; /* Pushes the footer to the bottom of the page */
+    margin-top: auto;
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+    text-align: center;
 }
 
-/* Media Queries for Responsiveness */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2rem;
-    }
-
-    .container {
-        flex-direction: column;
+/* Media Queries para Responsividade */
+@media (max-width: 992px) { /* Tablets e Mobile */
+    .top-info-controls-row,
+    .camera-robot-row,
+    .bottom-messages-debug-row {
+        flex-direction: column; /* Empilha as seções em colunas */
         align-items: center;
     }
-
     .card {
-        margin-bottom: 20px;
-        min-width: 90%;
-    }
-
-    .controls, .jokenpo-controls {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .button {
-        width: 100%;
-    }
-
-    .current-gestures {
-        flex-direction: column;
-        gap: 10px;
+        min-width: 90%; /* Linha 261: Mantido. Garante que o card ocupe 90% da largura em telas menores. */
+        max-width: 90%; /* Ocupa a maior parte da largura em telas menores */
     }
 }
 
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.8rem;
+@media (max-width: 480px) { /* Mobile muito pequeno */
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.5rem; }
+    .scoreboard { font-size: 1.5rem; gap: 10px; padding: 10px 20px; }
+    .score span { font-size: 2.5rem; }
+    .separator { font-size: 2.5rem; }
+    #round-result-main, .ai-game-feedback .result-ai { font-size: 1.4rem; }
+    #countdown-message, .ai-game-feedback .countdown-ai { font-size: 1.8rem; }
+    .button { padding: 10px 20px; font-size: 0.9rem; }
+    .player-info-live .gesture-icon { font-size: 3rem; }
+    .robot-section .robot-hand-display {
+        height: 180px; /* Linha 305: Mantido. Altura fixa para telas muito pequenas, pode ser necessário para manter o layout compacto. */
     }
-
-    .card {
-        padding: 15px;
-    }
-
-    h2 {
-        font-size: 1.5rem;
-    }
-
-    .scoreboard {
-        font-size: 1.5rem;
-        gap: 10px;
-        padding: 10px 20px;
-    }
-    .score span {
-        font-size: 2.5rem;
-    }
-    .separator {
-        font-size: 2.5rem;
-    }
-    #round-result-main {
-        font-size: 1.4rem; /* Smaller on small screens */
-    }
-    #countdown-message {
-        font-size: 1.8rem;
-    }
+    .robot-section .gesture-icon { font-size: 5rem; }
+    .debug-info-section h3 { font-size: 1rem; }
+    .debug-info-section p { font-size: 0.8rem; }
+    #jokenpo-json-display { max-height: 100px; font-size: 0.7rem; }
 }
