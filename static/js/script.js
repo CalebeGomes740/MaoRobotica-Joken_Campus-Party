@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    playRoundButton.addEventListener('click', async () => {
+    document.getElementById('jokenpo-play-btn').addEventListener('click', async () => {
         try {
             const response = await fetch('/play_jokenpo');
             const data = await response.json();
