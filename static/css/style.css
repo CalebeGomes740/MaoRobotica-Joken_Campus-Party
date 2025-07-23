@@ -322,7 +322,7 @@ h2 {
 }
 #round-result-main.won { color: #4caf50; }
 #round-result-main.lost { color: #f44336; }
-#round-result-main.draw { color: #ffeb3b; }
+#round-result_main.draw { color: #ffeb3b; }
 
 .countdown-display { margin: 0; }
 #countdown-message {
