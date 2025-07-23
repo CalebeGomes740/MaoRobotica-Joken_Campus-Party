@@ -258,9 +258,7 @@ h2 {
 
 
 /* Estilos para a seção do Placar e Controles (dentro do top-info-controls-row) */
-.game-scoreboard-controls {
-    /* Herda de .card */
-}
+/* .game-scoreboard-controls ruleset removed: was empty */
 
 .scoreboard {
     display: flex;
@@ -302,9 +300,7 @@ h2 {
 }
 
 /* Estilos para a seção de Mensagens Principais (dentro de bottom-messages-debug-row) */
-.main-messages-section {
-    /* Herda de .card */
-}
+/* .main-messages-section removed: empty ruleset */
 
 .result-message-area {
     width: 100%;
